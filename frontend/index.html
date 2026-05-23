@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Monitoring Air - Tubes Analisis Desain Sistem</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Socket.io for real-time updates -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container glass-panel">
+        <header class="app-header">
+            <div class="header-titles">
+                <h1>Sistem Monitoring Air Pintar</h1>
+                <p>Dashboard Real-time Berbasis Arduino Uno</p>
+            </div>
+            <div class="header-clock">
+                <div class="clock-time" id="liveClock">--:--:--</div>
+                <div class="clock-date" id="liveDate">Memuat...</div>
+            </div>
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="action-btn theme-btn icon-only-btn" aria-label="Toggle Theme">
+                    <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button id="resetDataBtn" class="action-btn reset-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Reset Data
+                </button>
+                <button id="exportCsvBtn" class="action-btn export-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export CSV
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Tangki Air Visual -->
+            <section class="card water-tank-card">
+                <h2>Visualisasi Tangki</h2>
+                <div class="tank-container">
+                    <div class="tank">
+                        <!-- Efek kilauan kaca silinder 3D -->
+                        <div class="tank-sheen"></div>
+                        
+                        <div class="water-level" id="waterLevel">
+                            <!-- Sistem Gelombang Air SVG (3 Lapisan Mulus) -->
+                            <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 20" preserveAspectRatio="none">
+                                <path class="wave wave-back" d="M 0 10 Q 30 14, 60 10 T 120 10 Q 150 14, 180 10 T 240 10 L 240 20 L 0 20 Z" />
+                                <path class="wave wave-middle" d="M 0 10 Q 30 6, 60 10 T 120 10 Q 150 6, 180 10 T 240 10 L 240 20 L 0 20 Z" />
+                                <path class="wave wave-front" d="M 0 10 Q 30 3, 60 10 T 120 10 Q 150 3, 180 10 T 240 10 L 240 20 L 0 20 Z" />
+                            </svg>
+                            
+                            <!-- Gelembung Udara Dinamis -->
+                            <div class="bubbles">
+                                <div class="bubble" style="--left: 15%; --size: 6px; --delay: 0.2s; --duration: 3.5s;"></div>
+                                <div class="bubble" style="--left: 45%; --size: 10px; --delay: 1.5s; --duration: 4.5s;"></div>
+                                <div class="bubble" style="--left: 70%; --size: 5px; --delay: 0.8s; --duration: 3s;"></div>
+                                <div class="bubble" style="--left: 30%; --size: 8px; --delay: 2.5s; --duration: 5s;"></div>
+                                <div class="bubble" style="--left: 85%; --size: 6px; --delay: 3.2s; --duration: 4s;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tank-labels">
+                        <span>100%</span>
+                        <span>75%</span>
+                        <span>50%</span>
+                        <span>25%</span>
+                        <span>0%</span>
+                    </div>
+                </div>
+                <h3 class="percentage-display" id="percentageDisplay">--%</h3>
+            </section>
+
+            <!-- Status Indikator -->
+            <section class="card status-card">
+                <h2>Status Kondisi</h2>
+
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="label">Status Saat Ini</span>
+                        <div class="status-badge" id="statusBadge">Menunggu...</div>
+                    </div>
+
+                    <div class="status-item">
+                        <span class="label">Buzzer Alarm</span>
+                        <div class="buzzer-indicator" id="buzzerIndicator">
+                            <div class="icon"></div>
+                            <span id="buzzerText">OFF</span>
+                        </div>
+                        <button id="muteBuzzerBtn" class="mute-btn">Matikan Alarm</button>
+                    </div>
+
+                    <div class="status-item full-width">
+                        <span class="label">Jarak Sensor ke Air</span>
+                        <div class="distance-value"><span id="distanceDisplay">--</span> cm</div>
+                    </div>
+                </div>
+
+                <div class="led-indicators">
+                    <div class="led" id="ledGreen">
+                        <div class="led-bulb"></div>
+                        <span>Penuh</span>
+                    </div>
+                    <div class="led" id="ledYellow">
+                        <div class="led-bulb"></div>
+                        <span>Sedang</span>
+                    </div>
+                    <div class="led" id="ledOrange">
+                        <div class="led-bulb"></div>
+                        <span>Rendah</span>
+                    </div>
+                    <div class="led" id="ledRed">
+                        <div class="led-bulb"></div>
+                        <span>Kosong</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Grafik Riwayat -->
+            <section class="card chart-card full-width">
+                <h2>Grafik Riwayat Ketinggian Air</h2>
+                <div class="chart-container">
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Tabel Riwayat -->
+            <section class="card table-card full-width">
+                <h2>Log Data Terbaru</h2>
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Volume Air</th>
+                                <th>Jarak Sensor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Tugas Besar Analisis Desain Sistem</p>
+        </footer>
+    </div>
+
+    <!-- Confirmation Modal for Reset Data -->
+    <div id="resetModal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel">
+            <h3>Konfirmasi Reset Data</h3>
+            <p>Apakah Anda yakin ingin menghapus seluruh data riwayat? Tindakan ini tidak dapat dibatalkan dan ID database akan kembali ke 1.</p>
+            <div class="modal-actions">
+                <button id="cancelResetBtn" class="modal-btn cancel-btn">Batal</button>
+                <button id="confirmResetBtn" class="modal-btn confirm-btn">Ya, Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

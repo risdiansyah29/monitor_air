@@ -1,5 +1,5 @@
 // Configuration: Set to your Ngrok public URL when deploying/accessing from mobile
-const BACKEND_URL = 'https://dreadful-sixties-refocus.ngrok-free.app'; 
+const BACKEND_URL = 'https://dreadful-sixties-refocus.ngrok-free.dev'; 
 
 // Initialize Socket.io connection to the backend
 const socket = io(BACKEND_URL, {

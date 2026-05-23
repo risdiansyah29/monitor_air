@@ -1,5 +1,12 @@
+// Configuration: Set to your Ngrok public URL when deploying/accessing from mobile
+const BACKEND_URL = 'https://dreadful-sixties-refocus.ngrok-free.app'; 
+
 // Initialize Socket.io connection to the backend
-const socket = io('http://localhost:5000');
+const socket = io(BACKEND_URL, {
+    extraHeaders: {
+        "ngrok-skip-browser-warning": "true"
+    }
+});
 
 // UI Elements
 const waterLevel = document.getElementById('waterLevel');
@@ -94,7 +101,11 @@ function addTableRow(data) {
 // Fetch historical data on load
 async function fetchHistory() {
     try {
-        const response = await fetch('http://localhost:5000/api/history?limit=20');
+        const response = await fetch(`${BACKEND_URL}/api/history?limit=20`, {
+            headers: {
+                "ngrok-skip-browser-warning": "true"
+            }
+        });
         const data = await response.json();
         
         data.forEach(item => {
@@ -218,7 +229,7 @@ const exportCsvBtn = document.getElementById('exportCsvBtn');
 if (exportCsvBtn) {
     exportCsvBtn.addEventListener('click', () => {
         // Trigger download from backend API
-        window.location.href = 'http://localhost:5000/api/export-csv';
+        window.location.href = `${BACKEND_URL}/api/export-csv`;
     });
 }
 
@@ -250,8 +261,11 @@ if (resetDataBtn && resetModal) {
             confirmResetBtn.disabled = true;
             confirmResetBtn.textContent = 'Menghapus...';
 
-            const response = await fetch('http://localhost:5000/api/reset', {
-                method: 'DELETE'
+            const response = await fetch(`${BACKEND_URL}/api/reset`, {
+                method: 'DELETE',
+                headers: {
+                    "ngrok-skip-browser-warning": "true"
+                }
             });
 
             if (response.ok) {

@@ -559,22 +559,116 @@ footer {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .container {
+        width: 96%;
+        margin: 1rem auto;
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+    
+    .card {
+        padding: 1.25rem;
+    }
+
     .app-header {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
         text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.25rem;
     }
+
+    .header-titles h1 {
+        font-size: 1.85rem;
+    }
+    
+    .header-titles p {
+        font-size: 0.95rem;
+    }
+
     .header-clock {
         width: 100%;
-        padding: 1rem;
+        padding: 0.75rem;
     }
+
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        flex: 1 1 140px;
+        justify-content: center;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        padding: 8px 16px;
+    }
+    
+    .theme-btn.icon-only-btn {
+        flex: 0 0 44px;
+    }
+
     .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
-    .header-titles h1 {
-        font-size: 2rem;
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .led-indicators {
+        gap: 0.5rem;
+        justify-content: space-around;
+        width: 100%;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
     }
 }
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.85rem;
+    }
+    
+    .card {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+    
+    .header-titles h1 {
+        font-size: 1.6rem;
+    }
+    
+    .percentage-display {
+        font-size: 2.5rem;
+    }
+    
+    .led-indicators {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        justify-items: center;
+    }
+    
+    .led {
+        flex-direction: row;
+        gap: 0.75rem;
+        align-items: center;
+    }
+}
+
 
 .mute-btn {
     margin-top: 15px;

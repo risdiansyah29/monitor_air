@@ -28,7 +28,7 @@ app.get('/api/history', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
     const [rows] = await db.query(
-      'SELECT * FROM sensor_data ORDER BY created_at DESC LIMIT ?', 
+      'SELECT * FROM sensor_data ORDER BY created_at DESC LIMIT ?',
       [limit]
     );
     res.json(rows.reverse()); // Reverse to get chronological order
@@ -42,14 +42,14 @@ app.get('/api/history', async (req, res) => {
 app.get('/api/export-csv', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM sensor_data ORDER BY created_at DESC');
-    
+
     // Set headers for CSV download
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename="sensor_data_export.csv"');
 
     // Create CSV header
     let csv = 'ID,Jarak (cm),Ketinggian Air (%),Status,Waktu\n';
-    
+
     // Append rows
     rows.forEach(row => {
       // Use local string format to make it readable in Excel
@@ -69,10 +69,10 @@ app.delete('/api/reset', async (req, res) => {
   try {
     await db.query('DELETE FROM sensor_data');
     // SQLite doesn't support TRUNCATE, so we delete rows and reset autoincrement ID manually
-    await db.query("DELETE FROM sqlite_sequence WHERE name='sensor_data'").catch(() => {});
-    
+    await db.query("DELETE FROM sqlite_sequence WHERE name='sensor_data'").catch(() => { });
+
     res.json({ message: 'Semua data riwayat berhasil dihapus dan ID telah di-reset.' });
-    
+
     // Broadcast an event to tell all clients to clear their charts
     io.emit('dataReset');
   } catch (error) {
@@ -84,7 +84,7 @@ app.delete('/api/reset', async (req, res) => {
 // Socket.io connection handler
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
-  
+
   // Send latest data on connect
   db.query('SELECT * FROM sensor_data ORDER BY created_at DESC LIMIT 1')
     .then(([rows]) => {

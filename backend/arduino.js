@@ -27,12 +27,10 @@ module.exports = (app) => {
           } else {
             console.log('Tidak ada perangkat USB Serial/Arduino aktif yang terdeteksi. Silakan hubungkan Arduino Anda.');
           }
-          console.log('Falling back to SIMULATION mode...');
-          startSimulation();
+          console.log('Silakan colok Arduino dan restart server untuk menghubungkan.');
         }).catch(listErr => {
           console.error('Error listing serial ports:', listErr.message);
-          console.log('Falling back to SIMULATION mode...');
-          startSimulation();
+          console.log('Silakan colok Arduino dan restart server untuk menghubungkan.');
         });
       } else {
         console.log(`Connected to Serial Port: ${portName}`);
